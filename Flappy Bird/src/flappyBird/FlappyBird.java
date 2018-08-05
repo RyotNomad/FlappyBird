@@ -23,7 +23,7 @@ public class FlappyBird extends Canvas implements Runnable, KeyListener{
 	Bird bird = new Bird();
 	Pipes pipe = new Pipes();
 	ArrayList<Pipes> pipes = new ArrayList<Pipes>();
-	int gameSpeed = 5;
+	int gameSpeed = 1;
 	boolean buttonPressed = false;
 	int count = 0;
 	
@@ -73,29 +73,8 @@ public class FlappyBird extends Canvas implements Runnable, KeyListener{
 			lastTime = now;
 			while(delta >= 1) {
 				count++;
-				tick();
-				
+				tick();		
 			
-				pipes.get(0).move(gameSpeed);
-				if(pipes.get(1).xPos - pipes.get(0).xPos > 280) {
-					pipes.get(1).move(gameSpeed);
-				}
-				if(pipes.get(2).xPos - pipes.get(1).xPos > 280) {
-					pipes.get(2).move(gameSpeed);
-				}
-				if(pipes.get(3).xPos - pipes.get(2).xPos > 280) {
-					pipes.get(3).move(gameSpeed);
-				}
-				//Make sure to delete passed pipes
-				for(int i=0;i<pipes.size();i++) {
-					Pipes temp = pipes.get(i);
-					if(temp.xPos < 0) {
-						pipes.remove(i);
-						//Add new pipe to replace old
-						Pipes newPipe = new Pipes();
-						pipes.add(newPipe);
-					}
-				}
 				delta--;
 			}
 			//For single lines in if statement, {} can be ommitted!!!
@@ -106,7 +85,7 @@ public class FlappyBird extends Canvas implements Runnable, KeyListener{
 			
 			if(System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
-				System.out.println("FPS: " + frames);
+				//System.out.println("FPS: " + frames);
 				frames = 0;
 			}
 		}
@@ -119,15 +98,62 @@ public class FlappyBird extends Canvas implements Runnable, KeyListener{
 			buttonPressed = false;
 			bird.spacePressed(5);
 		}
+		movePipes();
+		checkCollision();
 	}
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		if(key == 32) {
-			System.out.println("SPACE");
+			//System.out.println("SPACE");
 			buttonPressed = true;
 		}
+		
 	}
 	
+	public boolean checkCollision() {
+		int xPosition = bird.getX();
+		int yPosition = bird.getY();
+		
+		for(int i=0;i<pipes.size();i++) {
+			Pipes check = pipes.get(i);
+			int pipeYPos = check.height;
+			int pipeXPos = check.xPos;
+			
+			if(yPosition <= pipeYPos || yPosition > (pipeYPos + 100)) {
+				if(xPosition == pipeXPos) {
+					System.out.println("CRASH");
+				}
+			}
+			
+		}
+		if(yPosition > HEIGHT || yPosition <=0) {
+			System.out.println("FELL OUT OF MAP");
+		}
+		return true;
+	}
+	
+	public void movePipes() {
+		pipes.get(0).move(gameSpeed);
+		if(pipes.get(1).xPos - pipes.get(0).xPos > 280) {
+			pipes.get(1).move(gameSpeed);
+		}
+		if(pipes.get(2).xPos - pipes.get(1).xPos > 280) {
+			pipes.get(2).move(gameSpeed);
+		}
+		if(pipes.get(3).xPos - pipes.get(2).xPos > 280) {
+			pipes.get(3).move(gameSpeed);
+		}
+		//Make sure to delete passed pipes
+		for(int i=0;i<pipes.size();i++) {
+			Pipes temp = pipes.get(i);
+			if(temp.xPos < 0) {
+				pipes.remove(i);
+				//Add new pipe to replace old
+				Pipes newPipe = new Pipes();
+				pipes.add(newPipe);
+			}
+		}
+	}
 	private void render() {		
 		BufferStrategy bs = this.getBufferStrategy();
 		if(bs==null) {
